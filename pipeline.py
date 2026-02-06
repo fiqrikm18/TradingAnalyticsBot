@@ -25,4 +25,9 @@ if __name__ == "__main__":
 
         # 3. Finally, scan for specific Buy Signals
         run_step("src/analytics.py", "3 (DEEP DIVE SCANNER)")
+
+        time.sleep(2)
+
+        # 4. Wyckoff Accumulation Screener
+        run_step("src/wyckoff_screener.py", "4 (WYCKOFF ACCUMULATION)")
     print("\n🚀 Pipeline Completed.")

@@ -35,3 +35,9 @@ Thumbs.db
 # Misc
 *.bak
 *.tmp
+
+# AI Model
+*.keras
+
+# Images
+*.png

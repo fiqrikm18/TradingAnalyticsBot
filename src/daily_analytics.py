@@ -7,6 +7,7 @@ import requests
 import json
 import time
 from datetime import datetime
+import ai_utils
 import consts
 
 # --- CONFIGURATION ---
@@ -106,7 +107,7 @@ def analyze_market_health(ticker_dict):
         # 3. Volume Spikes (> 3x Average)
         if vol_ma > 0 and (vol / vol_ma) > 3.0:
             ratio = vol / vol_ma
-            stats['vol_spike'].append((ticker, ratio))
+            stats['vol_spike'].append((ticker, ratio, name))
 
         # 4. Volatility Squeeze (Bandwidth < 5%)
         if bandwidth < 0.05 and bandwidth > 0:
@@ -118,6 +119,19 @@ def analyze_market_health(ticker_dict):
             stats['watchlist'].append(ticker)
 
         processed += 1
+
+    # --- AI MARKET ANALYSIS ---
+    # We analyze a representative ticker (e.g., COMPOSITE or a major bank like BBCA if Index not available)
+    # Using 'BBCA.JK' as a market proxy for AI scoring since Indices might not have Volume.
+    print("🧠 Running AI Market Assessment...")
+    try:
+        model = ai_utils.train_model()  # In production, load saved model
+        market_proxy = yf.Ticker("BBCA.JK").history(period="1y")
+        if not market_proxy.empty:
+            ai_score = ai_utils.get_lstm_score(model, market_proxy)
+            stats['ai_score'] = ai_score
+    except Exception as e:
+        print(f"AI Error: {e}")
 
     print("\n✅ Analysis Complete.")
     return stats
@@ -136,7 +150,7 @@ def send_daily_brief(stats):
     # Format Lists
     top_vol = sorted(stats['vol_spike'], key=lambda x: x[1], reverse=True)[:5]
     vol_str = "\n".join(
-        [f"**{t[0]}** (`{t[1]:.1f}x`)" for t in top_vol]) if top_vol else "None"
+        [f"**{t[0]}** - {t[2]} (`{t[1]:.1f}x`)" for t in top_vol]) if top_vol else "None"
 
     squeeze_str = ", ".join(
         stats['squeeze'][:8]) if stats['squeeze'] else "None"
@@ -147,7 +161,7 @@ def send_daily_brief(stats):
         "username": "Market Chief",
         "embeds": [{
             "title": f"📅 Daily Market Brief | {datetime.now().strftime('%d %b %Y')}",
-            "description": f"**Market Sentiment:** {sentiment}\nAnalyzing **{stats['total']}** liquid stocks.",
+            "description": f"**Market Sentiment:** {sentiment}\nAnalyzing **{stats['total']}** liquid stocks.\n**AI Market Score:** `{stats.get('ai_score', 'N/A'):.2f}` (Accumulation Confidence)",
             "color": color,
             "fields": [
                 {
