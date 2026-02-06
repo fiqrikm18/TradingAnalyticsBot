@@ -14,6 +14,12 @@ An intelligent Python-based stock screener tailored for the **IHSG (Indonesia St
 * **🔔 Discord Integrations**: Sends rich embeds with analysis, charts, and trade setups directly to Discord.
 * **💾 Database Integration**: Stores scan results in PostgreSQL for historical tracking.
 
+## 🖼️ Sample Output
+
+| **Chart Aesthetic (Dark Theme)** | **Scan Summary** |
+|:---:|:---:|
+| ![Chart Sample](img/chart_MDLA.JK_9220ab.png) | ![Summary Sample](img/Screenshot%202026-02-06%20152715.png) |
+
 ## 🛠️ Installation
 
 1. **Clone the Repository**
