@@ -37,3 +37,6 @@ Thumbs.db
 
 # AI Model
 *.keras
+
+# Images
+*.png
